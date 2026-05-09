@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025年药敏助手（临床病原菌药敏分析）</title>
+    <title>2025年耐药数据</title>
     <style>
         * {
             margin: 0;
@@ -58,56 +58,48 @@
         }
     </style>
     <!-- 伪APP配置 -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuWFseWFseWNteWNliIsCiAgInNob3J0X25hbWUiOiAi6YCa5pyNIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmNWY3ZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjMTY3N2ZmIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGN4PSI1MCIgY3k9IjUwIiByeT0iMjAiIGZpbGw9JyMxNjc3ZmYnLz48dGV4dCB4PSI1MCIgeT0iNjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+6YeR5omXPC90ZXh0Pjwvc3ZnPyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIjIwMjTkuKrnvZHnvuiiiSIsCiAgInNob3J0X25hbWUiOiAi6YCa5pyNIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiaWNrZ3JvdW5kX2NvbG9yIjogIiNmNWY3ZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjMTY3N2ZmIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGN4PSI1MCIgY3k9IjUwIiByeT0iMjAiIGZpbGw9JyMxNjc3ZmYnLz48dGV4dCB4PSI1MCIgeT0iNjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+6YeR5omXPC90ZXh0Pjwvc3ZnPyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="药敏助手">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231677ff'/><text x='50' y='65' font-weight='bold' font-size='50' text-anchor='middle' fill='white'>药敏</text></svg>">
+    <meta name="apple-mobile-web-app-title" content="2025耐药数据">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231677ff'/><text x='50' y='65' font-weight='bold' font-size='50' text-anchor='middle' fill='white'>耐药</text></svg>">
 </head>
 <body>
     <div class="header">
-        <h1>💊 药敏助手（临床病原菌药敏分析）</h1>
+        <h1>💊 2025年耐药数据</h1>
     </div>
 
     <div class="button-group">
-        <button class="menu-btn" onclick="showChart('chart1')">总体病原菌分布</button>
-        <button class="menu-btn" onclick="showChart('chart2')">痰标本药敏</button>
-        <button class="menu-btn" onclick="showChart('chart3')">尿液标本药敏</button>
-        <button class="menu-btn" onclick="showChart('chart4')">血培养药敏</button>
-        <button class="menu-btn" onclick="showChart('chart5')">多重耐药菌（CRKP/CRE）</button>
-        <button class="menu-btn" onclick="showChart('chart6')">真菌药敏</button>
-        <button class="menu-btn" onclick="showChart('chart7')">标本质量统计</button>
-        <button class="menu-btn" onclick="showChart('chart8')">科室分布</button>
-        <button class="menu-btn" onclick="showChart('chart9')">其他统计</button>
+        <button class="menu-btn" onclick="showChart('chart1')">全院情况</button>
+        <button class="menu-btn" onclick="showChart('chart2')">标本类型及耐药情况</button>
+        <button class="menu-btn" onclick="showChart('chart3')">各科室病原菌及耐药情况</button>
+        <button class="menu-btn" onclick="showChart('chart4')">真菌耐药情况</button>
+        <button class="menu-btn" onclick="showChart('chart5')">标本送检质量情况</button>
+        <button class="menu-btn" onclick="showChart('chart6')">多重耐药变迁情况</button>
+        <button class="menu-btn" onclick="showChart('chart7')">细菌真菌天然耐药表情况</button>
     </div>
 
     <!-- 图片显示区域 -->
     <div id="chart1" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-1.png" alt="总体病原菌分布">
+        <img class="chart-img" src="https://你的图片地址1.png" alt="全院情况">
     </div>
     <div id="chart2" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-2.png" alt="痰标本药敏">
+        <img class="chart-img" src="https://你的图片地址2.png" alt="标本类型及耐药情况">
     </div>
     <div id="chart3" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-3.png" alt="尿液标本药敏">
+        <img class="chart-img" src="https://你的图片地址3.png" alt="各科室病原菌及耐药情况">
     </div>
     <div id="chart4" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-4.png" alt="血培养药敏">
+        <img class="chart-img" src="https://你的图片地址4.png" alt="真菌耐药情况">
     </div>
     <div id="chart5" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-5.png" alt="多重耐药菌">
+        <img class="chart-img" src="https://你的图片地址5.png" alt="标本送检质量情况">
     </div>
     <div id="chart6" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-6.png" alt="真菌药敏">
+        <img class="chart-img" src="https://你的图片地址6.png" alt="多重耐药变迁情况">
     </div>
     <div id="chart7" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-7.png" alt="标本质量统计">
-    </div>
-    <div id="chart8" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-8.png" alt="科室分布">
-    </div>
-    <div id="chart9" class="chart-container">
-        <img class="chart-img" src="https://636c-cloud1-1gnfd88laf20f113-1418196102.cos.ap-shanghai.myqcloud.com/chart-9.png" alt="其他统计">
+        <img class="chart-img" src="https://你的图片地址7.png" alt="细菌真菌天然耐药表情况">
     </div>
 
     <script>
