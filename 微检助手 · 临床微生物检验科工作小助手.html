@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>微检助手 · 临床微生物检验科工作小助手</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f4f8;
+            color: #1a2c3e;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* 侧边栏导航 (目录结构) */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+            overflow-y: auto;
+            transition: all 0.2s;
+        }
+
+        .logo-area {
+            padding: 24px 20px 16px 24px;
+            border-bottom: 1px solid #ecf3fa;
+        }
+
+        .logo-area h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #0f5b7a, #1e7b9e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-area p {
+            font-size: 0.75rem;
+            color: #5b7a95;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 12px 20px 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 6px;
+            border-radius: 14px;
+            font-weight: 500;
+            color: #2d4a6e;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: #5f8bb3;
+        }
+
+        .nav-item:hover {
+            background: #eef3fc;
+            color: #0f6b8c;
+        }
+
+        .nav-item.active {
+            background: #e1f0fa;
+            color: #0c6b8e;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0, 105, 130, 0.08);
+        }
+
+        .nav-item.active i {
+            color: #0c6b8e;
+        }
+
+        .sidebar-footer {
+            padding: 20px 20px 24px;
+            font-size: 0.7rem;
+            color: #7e95ab;
+            border-top: 1px solid #e9edf2;
+        }
+
+        /* 右侧主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 16px 28px;
+            border-bottom: 1px solid #e2edf2;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            backdrop-filter: blur(2px);
+        }
+
+        .search-wrapper {
+            flex: 2;
+            min-width: 260px;
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 48px;
+            padding: 6px 18px;
+            border: 1px solid #e0e9f0;
+            transition: all 0.2s;
+        }
+
+        .search-wrapper:focus-within {
+            background: #ffffff;
+            border-color: #2c9bcf;
+            box-shadow: 0 0 0 3px rgba(44, 155, 207, 0.1);
+        }
+
+        .search-wrapper i {
+            color: #7c9bc0;
+            font-size: 1.1rem;
+        }
+
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            font-weight: 400;
+        }
+
+        .search-wrapper button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #2c7fb8;
+            padding: 6px 8px;
+            border-radius: 40px;
+        }
+
+        .badge-tips {
+            background: #eef2ff;
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            color: #1e6b8f;
+        }
+
+        .content-pane {
+            padding: 24px 28px;
+        }
+
+        /* 卡片样式 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 24px;
+            padding: 18px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e9f0f5;
+            transition: all 0.2s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -12px rgba(0, 80, 100, 0.15);
+            border-color: #cde3ef;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1f5575;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #2c9bcf;
+            padding-left: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-category {
+            font-size: 0.7rem;
+            background: #e8f0fe;
+            padding: 4px 9px;
+            border-radius: 40px;
+            color: #1f6c8c;
+        }
+
+        .card-summary {
+            color: #2c4c6e;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            margin: 12px 0;
+        }
+
+        .keywords {
+            font-size: 0.7rem;
+            color: #6f8eac;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .keywords span {
+            background: #f0f6fa;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        .dashboard-welcome {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            border: 1px solid #e5edf3;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 24px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f4868;
+            border-left: 5px solid #2c9bcf;
+            padding-left: 16px;
+        }
+
+        .search-engine-directory {
+            background: #ffffffea;
+            border-radius: 28px;
+            padding: 6px 12px 18px 12px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #e2edf5;
+        }
+
+        .dir-header {
+            font-weight: 600;
+            padding: 12px 12px 4px;
+            font-size: 0.9rem;
+            color: #1c6e93;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dir-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .dir-chip {
+            background: #eff6fc;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1b6c8f;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #dbe9f2;
+        }
+
+        .dir-chip:hover {
+            background: #e0f0f9;
+            border-color: #7fb6d4;
+            transform: scale(0.98);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .no-result {
+            text-align: center;
+            padding: 48px 20px;
+            background: white;
+            border-radius: 40px;
+            color: #8aa9c4;
+        }
+
+        /* 表格样式（用于耐药数据和天然耐药表） */
+        .custom-table-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 12px;
+            overflow-x: auto;
+            border: 1px solid #e9edf2;
+            margin-top: 16px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .data-table th {
+            background: #eef4fc;
+            font-weight: 600;
+            color: #1f5a7a;
+        }
+        .data-table tr:hover {
+            background: #fafcff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px 0 24px;
+            font-size: 0.7rem;
+            color: #9bb4ca;
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                width: 80px;
+                min-width: 80px;
+            }
+            .sidebar .logo-area h2, .sidebar .logo-area p, .nav-item span, .sidebar-footer {
+                display: none;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 12px 0;
+            }
+            .nav-item i {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .content-pane {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- 侧边栏目录 (含新增三个菜单) -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2><i class="fas fa-microscope"></i> 微检助手</h2>
+            <p><i class="fas fa-flask"></i> 临床微生物检验科 · 知识中枢</p>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" data-nav="dashboard">
+                <i class="fas fa-tachometer-alt"></i> <span>工作台 · 总览</span>
+            </div>
+            <div class="nav-item" data-nav="bacteria">
+                <i class="fas fa-bacteria"></i> <span>细菌目录库</span>
+            </div>
+            <div class="nav-item" data-nav="fungus">
+                <i class="fas fa-leaf"></i> <span>真菌目录库</span>
+            </div>
+            <div class="nav-item" data-nav="antibiotic">
+                <i class="fas fa-capsules"></i> <span>抗生素 & 药敏</span>
+            </div>
+            <!-- 新增三个导航项 -->
+            <div class="nav-item" data-nav="microbe_projects">
+                <i class="fas fa-vial"></i> <span>微生物项目</span>
+            </div>
+            <div class="nav-item" data-nav="resistance_data">
+                <i class="fas fa-chart-line"></i> <span>耐药数据</span>
+            </div>
+            <div class="nav-item" data-nav="natural_resistance">
+                <i class="fas fa-table-list"></i> <span>天然耐药表</span>
+            </div>
+            <div class="nav-item" data-nav="protocol">
+                <i class="fas fa-clinic-medical"></i> <span>检验规程 / SOP</span>
+            </div>
+            <div class="nav-item" data-nav="qc">
+                <i class="fas fa-chart-line"></i> <span>质控标准</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <i class="fas fa-database"></i> 知识版本 v2.0 · CLSI M100 参照
+        </div>
+    </div>
+
+    <!-- 右侧主要内容区 -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="globalSearchInput" placeholder="搜索菌种、抗生素、规程、项目、耐药数据... (如: MRSA, 头孢曲松, 血培养)" autocomplete="off">
+                <button id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
+            </div>
+            <div class="badge-tips">
+                <i class="fas fa-calendar-alt"></i> 今日质控: 合格 ✔️ | ATCC25922 在控
+            </div>
+        </div>
+
+        <div class="content-pane" id="dynamicContent">
+            <div class="loading">加载知识库中...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========= 微生物检验知识库（原数据 + 新增三大模块数据）=========
+    const knowledgeDB = [
+        // 细菌、真菌、抗生素、规程、质控（原有）
+        { id: 1, title: "金黄色葡萄球菌 (Staphylococcus aureus)", category: "bacteria", subCat: "革兰阳性球菌", content: "凝固酶阳性，金黄色色素，甘露醇发酵阳性。院内感染常见，MRSA监测重要。", keywords: "MRSA, 凝固酶, 金黄色素, 头孢西丁" },
+        { id: 2, title: "大肠埃希菌 (Escherichia coli)", category: "bacteria", subCat: "革兰阴性杆菌", content: "IMViC (+ + - -), 发酵乳糖产酸产气，ESBL菌株需关注。", keywords: "ESBL, 发酵乳糖, IMViC, 碳青霉烯酶" },
+        { id: 3, title: "肺炎克雷伯菌 (Klebsiella pneumoniae)", category: "bacteria", subCat: "肠杆菌目", content: "动力阴性，V因子不依赖，粘液拉丝，产KPC酶监测", keywords: "KPC, CRE, 拉丝试验, 碳青霉烯类" },
+        { id: 4, title: "铜绿假单胞菌 (Pseudomonas aeruginosa)", category: "bacteria", subCat: "非发酵菌", content: "氧化酶阳性，绿脓色素，生物膜形成，对亚胺培南等耐药监测", keywords: "氧化酶, 色素, 亚胺培南, 多粘菌素" },
+        { id: 5, title: "白念珠菌 (Candida albicans)", category: "fungus", subCat: "酵母样真菌", content: "厚膜孢子阳性，芽管形成，CHROMagar显色绿色", keywords: "芽管试验, 显色培养基, 氟康唑" },
+        { id: 6, title: "烟曲霉 (Aspergillus fumigatus)", category: "fungus", subCat: "丝状真菌", content: "分生孢子头呈柱状，对伏立康唑敏感性监测", keywords: "丝状真菌, 伏立康唑, 半乳甘露聚糖" },
+        { id: 7, title: "头孢曲松 (Ceftriaxone)", category: "antibiotic", subCat: "三代头孢", content: "抗菌谱: 肠杆菌科、部分链球菌。脑膜炎治疗常用。根据CLSI M100折点。", keywords: "折点, MIC, 脑膜炎, CLSI" },
+        { id: 8, title: "美罗培南 (Meropenem)", category: "antibiotic", subCat: "碳青霉烯类", content: "对ESBL及AmpC酶稳定，CRE检测重要药物，耐药需报告。", keywords: "CRE, 美平, 碳青霉烯, 耐药机制" },
+        { id: 9, title: "万古霉素 (Vancomycin)", category: "antibiotic", subCat: "糖肽类", content: "MRSA及肠球菌重症感染。需监测肾毒性，MIC折点≤2 μg/mL", keywords: "MRSA, 肾毒性, 粪肠球菌, MIC" },
+        { id: 10, title: "血培养三级报告规程", category: "protocol", subCat: "血流感染", content: "1级: 阳性报警涂片结果 (危急值报告)；2级: 快速鉴定及药敏；3级: 正式报告+抗菌药物管理提示", keywords: "危急值, 三级报告, 涂片, 药敏" },
+        { id: 11, title: "痰培养标本拒收标准", category: "protocol", subCat: "标本质量", content: "鳞状上皮细胞＞25/LP，白细胞＜10/LP提示唾液污染；建议重新采集。", keywords: "标本质量, 痰培养, 合格率, Bartlett评分" },
+        { id: 12, title: "ATCC 25922 质控范围 (大肠埃希菌)", category: "qc", subCat: "药敏质控", content: "头孢曲松MIC: 0.03-0.12 µg/mL；环丙沙星MIC:0.004-0.015µg/mL。", keywords: "质控范围, CLSI, 室内质控, 抑菌圈" },
+        { id: 13, title: "ATCC 29213 金葡菌质控", category: "qc", subCat: "药敏质控", content: "苯唑西林MIC:0.12-0.5µg/mL；万古霉素MIC:0.5-2µg/mL。", keywords: "金葡质控, MRSA筛查, 万古霉素" },
+        { id: 14, title: "艰难拟梭菌抗原及毒素检测", category: "protocol", subCat: "厌氧菌", content: "GDH + 毒素A/B 两步法, 用于抗生素相关性腹泻", keywords: "CDI, 谷氨酸脱氢酶, 毒素, 腹泻" },
+        { id: 15, title: "隐球菌抗原侧向层析", category: "fungus", subCat: "隐球菌病", content: "快速检测新型隐球菌，阳性提示中枢神经系统感染。", keywords: "CrAg, 墨汁染色, 脑脊液" },
+        { id: 16, title: "CLSI M100 肠杆菌科药敏折点 (2024)", category: "antibiotic", subCat: "指南", content: "头孢曲松 R≥4 µg/mL, 美罗培南 R≥4 µg/mL, 粘菌素 R≥4 µg/mL。", keywords: "折点, 耐药, 敏感, 肠杆菌" }
+    ];
+
+    // 微生物项目 专项数据集
+    const microbeProjectsData = [
+        { title: "血培养（需氧+厌氧）", content: "检测菌血症/真菌血症，阳性报警平均时间12-36h，三级报告制度。", keywords: "血流感染, 报警时间, 危急值" },
+        { title: "痰培养+半定量", content: "下呼吸道感染，结合痰涂片评估合格性，半定量≥2+致病菌报告。", keywords: "合格标本, 半定量, 肺炎链球菌" },
+        { title: "尿培养+菌落计数", content: "清洁中段尿，菌落计数≥10^5 CFU/mL 有意义，鉴别污染。", keywords: "尿路感染, 计数, 大肠埃希菌" },
+        { title: "脑脊液培养", content: "中枢神经系统感染，立即送检，同时做涂片及隐球菌抗原检测。", keywords: "脑膜炎, 涂片, 隐球菌" },
+        { title: "无菌体液培养（胸腹水、关节液）", content: "严格无菌采集，增菌培养，鉴定病原菌及药敏。", keywords: "积液, 穿刺, 厌氧培养" },
+        { title: "大便培养+艰难拟梭菌毒素", content: "腹泻病原体筛查：沙门氏菌、志贺氏菌、弯曲菌，艰难拟梭菌毒素检测。", keywords: "腹泻, 毒素, 沙门氏菌" },
+        { title: "分枝杆菌培养+药敏", content: "结核与NTM，液体快速培养系统，报阳后鉴定及一线抗结核药敏。", keywords: "结核, MGIT, 耐药结核" },
+        { title: "真菌G/GM试验", content: "G试验筛查侵袭性真菌病，GM试验用于曲霉菌感染。", keywords: "真菌抗原, 曲霉, 念珠菌" }
+    ];
+
+    // 耐药数据 专项 (模拟全院耐药监测数据)
+    const resistanceDataList = [
+        { title: "2025年Q1 本院 CRE耐药率", content: "肺炎克雷伯菌CRE检出率12.3%，大肠埃希菌CRE 3.1%。碳青霉烯酶型KPC占78%", keywords: "CRE, 碳青霉烯酶, 耐药监测" },
+        { title: "MRSA 检出趋势", content: "2024年全年MRSA平均耐药率34.5%（甲氧西林耐药），万古霉素敏感率100%", keywords: "MRSA, 万古霉素, 耐药率" },
+        { title: "铜绿假单胞菌 耐药谱", content: "亚胺培南耐药率21.6%，美罗培南19.8%，头孢他啶16.5%，多粘菌素耐药仅0.8%", keywords: "铜绿, 亚胺培南, 多重耐药" },
+        { title: "鲍曼不动杆菌 耐药数据", content: "碳青霉烯类耐药率68%，替加环素MIC50 1μg/mL，多粘菌素B敏感率92%", keywords: "CRAB, 替加环素, 泛耐药" },
+        { title: "屎肠球菌 万古霉素耐药", content: "VRE检出率15.1%，利奈唑胺耐药罕见，替加环素敏感率高", keywords: "VRE, 屎肠球菌, 利奈唑胺" },
+        { title: "大肠埃希菌 ESBL 表型", content: "产ESBL菌株占比36.7%，对头孢曲松耐药率42%，碳青霉烯类仍高度敏感", keywords: "ESBL, 头孢曲松, 碳青霉烯" }
+    ];
+
+    // 天然耐药表 (基于CLSI M100 及已知天然耐药)
+    const naturalResistanceData = [
+        { pathogen: "肠杆菌科（大肠、克雷伯等）", naturalResistance: "青霉素G，糖肽类，夫西地酸，利奈唑胺（体外不敏感）", note: "对氨苄西林/阿莫西林部分种属敏感" },
+        { pathogen: "铜绿假单胞菌", naturalResistance: "替加环素, 甲氧苄啶, 磺胺类, 一代/二代头孢菌素", note: "对多粘菌素、头孢他啶等敏感需药敏证实" },
+        { pathogen: "鲍曼不动杆菌", naturalResistance: "氨苄西林, 氨曲南, 一代头孢, 糖肽类", note: "对碳青霉烯类天然不稳定，耐药可通过获得性机制增强" },
+        { pathogen: "嗜麦芽窄食单胞菌", naturalResistance: "碳青霉烯类, 替加环素, 氨基糖苷类", note: "治疗可选SMZ-TMP，左氧氟沙星" },
+        { pathogen: "洋葱伯克霍尔德菌", naturalResistance: "多粘菌素, 一代头孢, 碳青霉烯类", note: "对SMZ-TMP，头孢他啶通常敏感" },
+        { pathogen: "沙门氏菌属", naturalResistance: "万古霉素, 达托霉素(固有), 克林霉素", note: "肠外感染需检测碳青霉烯类药敏" },
+        { pathogen: "肠球菌属（粪肠球菌）", naturalResistance: "头孢菌素类, 氨基糖苷类(高水平耐药除外), 克林霉素", note: "粪肠球菌对氨苄西林多数敏感; VRE另报" },
+        { pathogen: "念珠菌属", naturalResistance: "白念珠菌对棘白菌素天然敏感；克柔念珠菌对氟康唑天然耐药", note: "光滑念珠菌可对唑类交叉耐药" }
+    ];
+
+    // 辅助: category 名称映射
+    function getCategoryName(cat) {
+        const map = {
+            'bacteria': '细菌目录',
+            'fungus': '真菌目录',
+            'antibiotic': '抗生素 & 药敏',
+            'protocol': '检验规程',
+            'qc': '质控标准',
+            'microbe_projects': '微生物项目',
+            'resistance_data': '耐药数据',
+            'natural_resistance': '天然耐药表'
+        };
+        return map[cat] || '知识条目';
+    }
+
+    // 根据导航获取数据数组
+    function getDataByNav(nav) {
+        if (nav === 'dashboard') return [];
+        if (nav === 'bacteria') return knowledgeDB.filter(item => item.category === 'bacteria');
+        if (nav === 'fungus') return knowledgeDB.filter(item => item.category === 'fungus');
+        if (nav === 'antibiotic') return knowledgeDB.filter(item => item.category === 'antibiotic');
+        if (nav === 'protocol') return knowledgeDB.filter(item => item.category === 'protocol');
+        if (nav === 'qc') return knowledgeDB.filter(item => item.category === 'qc');
+        if (nav === 'microbe_projects') return microbeProjectsData.map(item => ({ ...item, category: 'microbe_projects' }));
+        if (nav === 'resistance_data') return resistanceDataList.map(item => ({ ...item, category: 'resistance_data' }));
+        if (nav === 'natural_resistance') return []; // 单独处理表格渲染，不用卡片模式
+        return [];
+    }
+
+    // 渲染表格形式的天然耐药表
+    function renderNaturalResistanceTable() {
+        return `
+            <div class="section-title"><i class="fas fa-table-list"></i> 临床常见菌种天然耐药表（依据CLSI M100 & 经典文献）</div>
+            <div class="custom-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>病原菌 / 菌属</th><th>固有天然耐药抗生素</th><th>备注 / 注意事项</th></tr>
+                    </thead>
+                    <tbody>
+                        ${naturalResistanceData.map(item => `
+                            <tr>
+                                <td><strong>${escapeHtml(item.pathogen)}</strong></td>
+                                <td>${escapeHtml(item.naturalResistance)}</td>
+                                <td>${escapeHtml(item.note)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <footer><i class="fas fa-dna"></i> 天然耐药指无需获得性耐药机制即可表达的耐药，药敏试验时若报告敏感应复核。</footer>
+        `;
+    }
+
+    // 渲染卡片列表 (适配普通条目)
+    function renderCardList(items, titleText) {
+        if (!items.length) {
+            return `<div class="no-result"><i class="fas fa-search-minus"></i> 暂无数据，请稍后或切换目录</div>`;
+        }
+        let html = `<div class="section-title"><i class="fas fa-list-ul"></i> ${titleText} (${items.length})</div><div class="card-grid">`;
+        items.forEach(item => {
+            let categoryLabel = getCategoryName(item.category);
+            html += `
+                <div class="data-card">
+                    <div class="card-title">
+                        <span>${escapeHtml(item.title)}</span>
+                        <span class="card-category">${categoryLabel}</span>
+                    </div>
+                    <div class="card-summary">${escapeHtml(item.content)}</div>
+                    <div class="keywords"><i class="fas fa-tag"></i> 关键词: ${escapeHtml(item.keywords)}</div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function escapeHtml(str) { 
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); 
+    }
+
+    // 工作台 + 搜索引擎目录
+    function renderDashboard() {
+        const engineDirHtml = `
+            <div class="search-engine-directory">
+                <div class="dir-header"><i class="fas fa-sitemap"></i> 🔍 搜索引擎目录 · 分类检索 (点击即查)</div>
+                <div class="dir-grid">
+                    <div class="dir-chip" data-dir-search="ESBL">📌 ESBL检测指南</div>
+                    <div class="dir-chip" data-dir-search="MRSA">🧫 MRSA筛查流程</div>
+                    <div class="dir-chip" data-dir-search="血培养">🩸 血培养三级报告</div>
+                    <div class="dir-chip" data-dir-search="真菌药敏">🍄 真菌药敏试验</div>
+                    <div class="dir-chip" data-dir-search="CRE">⚠️ CRE防控</div>
+                    <div class="dir-chip" data-dir-search="质控范围">📊 质控标准查询</div>
+                    <div class="dir-chip" data-dir-search="碳青霉烯酶">🧬 碳青霉烯酶表型</div>
+                    <div class="dir-chip" data-dir-search="天然耐药">🧬 天然耐药表</div>
+                    <div class="dir-chip" data-dir-search="微生物项目">🧪 微生物送检项目</div>
+                    <div class="dir-chip" data-dir-search="耐药率">📈 耐药数据趋势</div>
+                </div>
+            </div>
+        `;
+        const quickHtml = `
+            <div class="dashboard-welcome">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><i class="fas fa-stethoscope" style="font-size:1.6rem;color:#1d7ea5;"></i><div><strong>👩‍⚕️ 今日工作小贴士</strong><p style="font-size:0.75rem; margin-top:5px;">⭐ 室内质控已完成 | 危急值报告流程双人核对 | CRE筛查送检率提升</p></div></div>
+                <div style="background:#F8FAFE; border-radius: 28px; padding: 8px 12px;"><i class="fas fa-lightbulb"></i> 推荐阅读：血培养污染率控制，本周重点监测鲍曼不动杆菌耐药趋势，新发布天然耐药参考表</div>
+            </div>
+            <div class="section-title"><i class="fas fa-star-of-life"></i> 常用知识卡片推荐</div>
+            <div class="card-grid">
+                ${knowledgeDB.filter(item => ['bacteria', 'antibiotic', 'protocol'].includes(item.category)).slice(0,4).map(item => `
+                    <div class="data-card">
+                        <div class="card-title"><span>${escapeHtml(item.title)}</span><span class="card-category">${getCategoryName(item.category)}</span></div>
+                        <div class="card-summary">${escapeHtml(item.content)}</div>
+                        <div class="keywords"><i class="fas fa-tag"></i> ${escapeHtml(item.keywords)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        return engineDirHtml + quickHtml;
+    }
+
+    let currentNav = "dashboard";
+    let currentSearchKeyword = "";
+
+    // 全局搜索（跨所有数据集，包括新增的项目和耐药数据）
+    function performSearch(keyword) {
+        if (!keyword.trim()) return null;
+        const lowerKw = keyword.trim().toLowerCase();
+        const allItems = [
+            ...knowledgeDB,
+            ...microbeProjectsData.map(m => ({ ...m, category: 'microbe_projects' })),
+            ...resistanceDataList.map(r => ({ ...r, category: 'resistance_data' })),
+            ...naturalResistanceData.map(n => ({ title: n.pathogen + " 天然耐药", content: n.naturalResistance + "。备注：" + n.note, category: 'natural_resistance', keywords: n.pathogen + " 天然耐药" }))
+        ];
+        return allItems.filter(item => 
+            (item.title && item.title.toLowerCase().includes(lowerKw)) ||
+            (item.content && item.content.toLowerCase().includes(lowerKw)) ||
+            (item.keywords && item.keywords.toLowerCase().includes(lowerKw))
+        );
+    }
+
+    // 主渲染
+    function renderMain() {
+        const container = document.getElementById("dynamicContent");
+        if (!container) return;
+
+        if (currentSearchKeyword && currentSearchKeyword.trim() !== "") {
+            const results = performSearch(currentSearchKeyword);
+            if (results && results.length > 0) {
+                container.innerHTML = renderCardList(results, `🔎 搜索结果：“${escapeHtml(currentSearchKeyword)}”`) + `<footer><i class="fas fa-arrow-left"></i> 点击左侧目录或清除搜索可返回</footer>`;
+            } else {
+                container.innerHTML = `<div class="no-result"><i class="fas fa-dizzy"></i> 未检索到 “${escapeHtml(currentSearchKeyword)}” 相关内容。</div>`;
+            }
+            return;
+        }
+
+        if (currentNav === 'dashboard') {
+            container.innerHTML = renderDashboard();
+            setTimeout(() => {
+                document.querySelectorAll('.dir-chip').forEach(chip => {
+                    chip.removeEventListener('click', dirClickHandler);
+                    chip.addEventListener('click', dirClickHandler);
+                });
+            }, 20);
+            return;
+        }
+
+        if (currentNav === 'natural_resistance') {
+            container.innerHTML = renderNaturalResistanceTable() + `<footer><i class="fas fa-microscope"></i> 临床微生物检验科 · 天然耐药知识库</footer>`;
+            return;
+        }
+
+        const data = getDataByNav(currentNav);
+        let titleMap = {
+            bacteria: "🧫 细菌鉴定目录 & 临床菌株",
+            fungus: "🍄 真菌学目录 / 酵母及丝状真菌",
+            antibiotic: "💊 抗生素药敏目录 & CLSI折点",
+            protocol: "📋 检验规程 / SOP 目录",
+            qc: "🔬 质控标准 & 室内质控目录",
+            microbe_projects: "🧬 微生物检验项目大全",
+            resistance_data: "📉 本院及全国耐药监测数据"
+        };
+        let title = titleMap[currentNav] || "知识目录";
+        container.innerHTML = renderCardList(data, title) + `<footer><i class="fas fa-flask"></i> 微检助手 · 专业支持</footer>`;
+    }
+
+    function dirClickHandler(e) {
+        let searchValue = e.currentTarget.getAttribute('data-dir-search');
+        if (searchValue) {
+            currentSearchKeyword = searchValue;
+            currentNav = 'dashboard';
+            updateActiveNav('dashboard');
+            const searchInput = document.getElementById('globalSearchInput');
+            if (searchInput) searchInput.value = searchValue;
+            renderMain();
+        }
+    }
+
+    function updateActiveNav(activeId) {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const navVal = item.getAttribute('data-nav');
+            if (navVal === activeId) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+    }
+
+    function bindNavEvents() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const navValue = item.getAttribute('data-nav');
+                if (!navValue) return;
+                currentSearchKeyword = "";
+                const searchInput = document.getElementById('globalSearchInput');
+                if (searchInput) searchInput.value = "";
+                currentNav = navValue;
+                updateActiveNav(navValue);
+                renderMain();
+            });
+        });
+    }
+
+    function bindSearchEvents() {
+        const searchInput = document.getElementById('globalSearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (!searchInput) return;
+        const doSearch = () => {
+            const keyword = searchInput.value.trim();
+            if (keyword === "") {
+                currentSearchKeyword = "";
+                renderMain();
+            } else {
+                currentSearchKeyword = keyword;
+                updateActiveNav(null);
+                renderMain();
+            }
+        };
+        searchInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') doSearch(); });
+        if (clearBtn) clearBtn.addEventListener('click', () => {
+            searchInput.value = "";
+            currentSearchKeyword = "";
+            if (currentNav === 'dashboard') updateActiveNav('dashboard');
+            else updateActiveNav(currentNav);
+            renderMain();
+        });
+        const searchIconBtn = document.querySelector('.search-wrapper button');
+        if (searchIconBtn) searchIconBtn.addEventListener('click', doSearch);
+    }
+
+    function init() {
+        bindNavEvents();
+        bindSearchEvents();
+        currentNav = 'dashboard';
+        updateActiveNav('dashboard');
+        renderMain();
+    }
+    init();
+</script>
+</body>
+</html>
